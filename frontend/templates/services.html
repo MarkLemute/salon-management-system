@@ -1,61 +1,440 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Our Services - Salon MS{% endblock %}
+{% block title %}Service Menu - Nextdoor Saloon{% endblock %}
+
+{% block extra_css %}
+<style>
+    .menu-header {
+        background: var(--color-primary);
+        color: white;
+        padding: 50px 0;
+        margin: -20px -15px 40px;
+        text-align: center;
+    }
+    
+    .menu-header h1 {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .menu-header .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        font-style: italic;
+    }
+    
+    .menu-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--color-card-bg);
+        border-radius: var(--radius-3xl);
+        box-shadow: var(--shadow-lg);
+        padding: 40px;
+    }
+    
+    .menu-category {
+        margin-bottom: 50px;
+    }
+    
+    .menu-category:last-child {
+        margin-bottom: 0;
+    }
+    
+    .category-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid var(--color-primary);
+    }
+    
+    .category-icon {
+        font-size: 2.5rem;
+        width: 60px;
+        height: 60px;
+        background: var(--color-primary);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .category-title {
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: var(--font-heading);
+        color: var(--color-foreground);
+        margin: 0;
+    }
+    
+    .menu-item {
+        background: var(--color-muted-bg);
+        border-radius: 15px;
+        padding: 20px 25px;
+        margin-bottom: 15px;
+        transition: all var(--transition-base);
+        border-left: 5px solid transparent;
+    }
+    
+    .menu-item:hover {
+        background: var(--color-card-bg);
+        border-left-color: var(--color-primary);
+        box-shadow: var(--shadow-md);
+        transform: translateX(5px);
+    }
+    
+    .menu-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .service-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        font-family: var(--font-heading);
+        color: var(--color-foreground);
+        margin: 0;
+        flex: 1;
+    }
+    
+    .service-price-tag {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--color-interactive);
+        white-space: nowrap;
+    }
+    
+    .menu-item-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .service-description-menu {
+        flex: 1;
+        color: #847A71;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 0;
+        min-width: 250px;
+    }
+    
+    .service-meta {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #847A71;
+        font-size: 0.9rem;
+    }
+    
+    .meta-item i {
+        color: var(--color-primary);
+    }
+    
+    .menu-item-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .btn-book-menu {
+        background: var(--color-interactive);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 25px;
+        border: none;
+        font-weight: 600;
+        transition: all var(--transition-base);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-book-menu:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        color: white;
+        background: #A96A58;
+    }
+    
+    .btn-details-menu {
+        background: var(--color-card-bg);
+        color: var(--color-primary);
+        padding: 10px 20px;
+        border-radius: 25px;
+        border: 2px solid var(--color-primary);
+        font-weight: 600;
+        transition: all var(--transition-base);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-details-menu:hover {
+        background: var(--color-primary);
+        color: white;
+    }
+    
+    .no-services {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    
+    .no-services-icon-large {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+    
+    .admin-menu-actions {
+        text-align: center;
+        margin-top: 40px;
+        padding: 30px;
+        background: var(--color-muted-bg);
+        border-radius: 15px;
+    }
+    
+    .btn-add-service {
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 25px;
+        background: var(--color-primary);
+        border: none;
+        transition: all var(--transition-base);
+    }
+    
+    .btn-add-service:hover {
+        background: #7A8876;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .divider-line {
+        height: 2px;
+        background: linear-gradient(to right, transparent, var(--color-primary), transparent);
+        margin: 30px 0;
+    }
+    
+    @media (max-width: 768px) {
+        .menu-container {
+            padding: 25px 20px;
+        }
+        
+        .menu-header h1 {
+            font-size: 2rem;
+        }
+        
+        .category-title {
+            font-size: 1.5rem;
+        }
+        
+        .menu-item-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .menu-item-body {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .menu-item-actions {
+            width: 100%;
+            flex-direction: column;
+        }
+        
+        .btn-book-menu,
+        .btn-details-menu {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="mb-4 text-center">
-    <h1 class="display-5">Our Professional Services</h1>
-    <p class="lead text-muted">Browse our range of premium salon services</p>
+<div class="menu-header">
+    <div class="container">
+        <h1>💇 Service Menu</h1>
+        <p class="subtitle">"Where Beauty Meets Excellence"</p>
+    </div>
 </div>
 
-{% if services %}
-    <div class="row">
-        {% for service in services %}
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 shadow-sm hover-shadow">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">{{ service.name }}</h5>
-                        <p class="card-text text-muted">{{ service.description|truncatewords:20 }}</p>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <p class="mb-1"><i class="bi bi-clock"></i> <strong>Duration:</strong></p>
-                                <p class="text-muted">{{ service.duration }} minutes</p>
-                            </div>
-                            <div class="text-end">
-                                <p class="mb-1"><strong>Price:</strong></p>
-                                <p class="text-primary fs-4 mb-0">${{ service.price }}</p>
+<div class="container">
+    {% if services %}
+        <div class="menu-container">
+            
+            <!-- Hair Services -->
+            {% with hair_services=services|dictsort:"name" %}
+            {% if hair_services %}
+            <div class="menu-category">
+                <div class="category-header">
+                    <div class="category-icon">✂️</div>
+                    <h2 class="category-title">Hair Services</h2>
+                </div>
+                
+                {% for service in services %}
+                    {% if 'Hair' in service.name or 'Braid' in service.name or 'Blowout' in service.name or 'Updo' in service.name or 'Keratin' in service.name or 'Cornrows' in service.name or 'Knotless' in service.name or 'Box' in service.name %}
+                    <div class="menu-item">
+                        <div class="menu-item-header">
+                            <h3 class="service-name">{{ service.name }}</h3>
+                            <span class="service-price-tag">${{ service.price }}</span>
+                        </div>
+                        <div class="menu-item-body">
+                            <p class="service-description-menu">{{ service.description }}</p>
+                            <div class="service-meta">
+                                <span class="meta-item">
+                                    <i class="bi bi-clock-fill"></i>
+                                    <strong>{{ service.duration }} min</strong>
+                                </span>
                             </div>
                         </div>
-                    </div>
-                    <div class="card-footer bg-transparent border-top">
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'appointment_create' %}?service={{ service.id }}" class="btn btn-primary w-100">
-                                <i class="bi bi-calendar-check"></i> Book This Service
+                        <div class="menu-item-actions">
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'appointment_create' %}?service={{ service.id }}" class="btn-book-menu">
+                                    <i class="bi bi-calendar-check-fill"></i> Book Now
+                                </a>
+                            {% else %}
+                                <a href="{% url 'login' %}?next={% url 'appointment_create' %}?service={{ service.id }}" class="btn-book-menu">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login to Book
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'service_detail' service.id %}" class="btn-details-menu">
+                                <i class="bi bi-info-circle"></i> Details
                             </a>
-                        {% else %}
-                            <a href="{% url 'login' %}?next={% url 'appointment_create' %}?service={{ service.id }}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-box-arrow-in-right"></i> Login to Book
-                            </a>
-                        {% endif %}
+                        </div>
                     </div>
-                </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="alert alert-warning text-center">
-        <h4><i class="bi bi-exclamation-triangle"></i> No Services Available</h4>
-        <p>Please check back later for our service offerings.</p>
-    </div>
-{% endif %}
+            {% endif %}
+            {% endwith %}
+            
+            <div class="divider-line"></div>
+            
+            <!-- Nail Services -->
+            <div class="menu-category">
+                <div class="category-header">
+                    <div class="category-icon">💅</div>
+                    <h2 class="category-title">Nail Services</h2>
+                </div>
+                
+                {% for service in services %}
+                    {% if 'Nail' in service.name or 'Manicure' in service.name or 'Pedicure' in service.name or 'Gel' in service.name %}
+                    <div class="menu-item">
+                        <div class="menu-item-header">
+                            <h3 class="service-name">{{ service.name }}</h3>
+                            <span class="service-price-tag">${{ service.price }}</span>
+                        </div>
+                        <div class="menu-item-body">
+                            <p class="service-description-menu">{{ service.description }}</p>
+                            <div class="service-meta">
+                                <span class="meta-item">
+                                    <i class="bi bi-clock-fill"></i>
+                                    <strong>{{ service.duration }} min</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="menu-item-actions">
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'appointment_create' %}?service={{ service.id }}" class="btn-book-menu">
+                                    <i class="bi bi-calendar-check-fill"></i> Book Now
+                                </a>
+                            {% else %}
+                                <a href="{% url 'login' %}?next={% url 'appointment_create' %}?service={{ service.id }}" class="btn-book-menu">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login to Book
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'service_detail' service.id %}" class="btn-details-menu">
+                                <i class="bi bi-info-circle"></i> Details
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="divider-line"></div>
+            
+            <!-- Beauty & Spa Services -->
+            <div class="menu-category">
+                <div class="category-header">
+                    <div class="category-icon">✨</div>
+                    <h2 class="category-title">Beauty & Spa</h2>
+                </div>
+                
+                {% for service in services %}
+                    {% if 'Facial' in service.name or 'Makeup' in service.name or 'Eyebrow' in service.name or 'Waxing' in service.name or 'Treatment' in service.name %}
+                    {% if 'Hair' not in service.name and 'Keratin' not in service.name %}
+                    <div class="menu-item">
+                        <div class="menu-item-header">
+                            <h3 class="service-name">{{ service.name }}</h3>
+                            <span class="service-price-tag">${{ service.price }}</span>
+                        </div>
+                        <div class="menu-item-body">
+                            <p class="service-description-menu">{{ service.description }}</p>
+                            <div class="service-meta">
+                                <span class="meta-item">
+                                    <i class="bi bi-clock-fill"></i>
+                                    <strong>{{ service.duration }} min</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="menu-item-actions">
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'appointment_create' %}?service={{ service.id }}" class="btn-book-menu">
+                                    <i class="bi bi-calendar-check-fill"></i> Book Now
+                                </a>
+                            {% else %}
+                                <a href="{% url 'login' %}?next={% url 'appointment_create' %}?service={{ service.id }}" class="btn-book-menu">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login to Book
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'service_detail' service.id %}" class="btn-details-menu">
+                                <i class="bi bi-info-circle"></i> Details
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+        </div>
+    {% else %}
+        <div class="menu-container">
+            <div class="no-services">
+                <div class="no-services-icon-large">💇</div>
+                <h3>Service Menu Coming Soon</h3>
+                <p class="text-muted">We're preparing our amazing services for you!</p>
+            </div>
+        </div>
+    {% endif %}
 
-{% if user.is_authenticated and user.role == 'Admin' %}
-    <div class="text-center mt-4">
-        <a href="{% url 'service_create' %}" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Add New Service
-        </a>
-    </div>
-{% endif %}
+    {% if user.is_authenticated and user.role == 'Admin' %}
+        <div class="admin-menu-actions">
+            <h4>⚙️ Admin Controls</h4>
+            <a href="{% url 'service_create' %}" class="btn btn-success btn-add-service mt-3">
+                <i class="bi bi-plus-circle-fill"></i> Add New Service
+            </a>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

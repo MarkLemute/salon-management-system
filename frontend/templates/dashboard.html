@@ -1,63 +1,471 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - Salon MS{% endblock %}
+{% block title %}Dashboard - Nextdoor Saloon{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    .dashboard-header {
+        background: var(--color-primary);
+        padding: 50px 0;
+        border-radius: 20px;
+        color: white;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -150px;
+        right: -150px;
+    }
+    
+    .dashboard-welcome {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .dashboard-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .stat-card {
+        background: var(--color-card-bg);
+        border-radius: var(--radius-3xl);
+        padding: 30px;
+        box-shadow: var(--shadow-md);
+        transition: all var(--transition-base);
+        border: 2px solid transparent;
+        height: 100%;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--color-primary);
+    }
+    
+    .stat-card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+    
+    .stat-card-icon.purple {
+        background: var(--color-primary);
+        color: white;
+    }
+    
+    .stat-card-icon.green {
+        background: #7A8876;
+        color: white;
+    }
+    
+    .stat-card-icon.orange {
+        background: var(--color-interactive);
+        color: white;
+    }
+    
+    .stat-card-icon.blue {
+        background: var(--color-secondary);
+        color: var(--color-foreground);
+    }
+    
+    .stat-card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--color-foreground);
+        margin-bottom: 5px;
+    }
+    
+    .stat-card-label {
+        color: #847A71;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+    
+    .action-card {
+        background: var(--color-muted-bg);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        transition: all var(--transition-base);
+        text-decoration: none;
+        display: block;
+        border: 2px solid transparent;
+        height: 100%;
+    }
+    
+    .action-card:hover {
+        background: var(--color-card-bg);
+        border-color: var(--color-primary);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .action-card-icon {
+        width: 70px;
+        height: 70px;
+        background: var(--color-primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2rem;
+    }
+    
+    .action-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-foreground);
+        margin-bottom: 8px;
+    }
+    
+    .action-card-text {
+        color: #847A71;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        font-family: var(--font-heading);
+        color: var(--color-foreground);
+        margin-bottom: 25px;
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 30px;
+        background: var(--color-primary);
+        border-radius: 10px;
+    }
+    
+    .appointment-card {
+        background: var(--color-card-bg);
+        border-radius: var(--radius-2xl);
+        padding: 25px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 15px;
+        border-left: 5px solid var(--color-primary);
+        transition: all var(--transition-base);
+    }
+    
+    .appointment-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateX(5px);
+    }
+    
+    .appointment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .appointment-service {
+        font-size: 1.2rem;
+        font-weight: 700;
+        font-family: var(--font-heading);
+        color: var(--color-foreground);
+    }
+    
+    .appointment-status {
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .appointment-details {
+        color: #666;
+        font-size: 0.95rem;
+    }
+    
+    .appointment-details i {
+        margin-right: 8px;
+        color: #667eea;
+    }
+    
+    .admin-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 40px;
+        color: white;
+        margin-top: 40px;
+    }
+    
+    .admin-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        text-decoration: none;
+        display: block;
+        color: white;
+    }
+    
+    .admin-card:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-5px);
+        color: white;
+    }
+    
+    .admin-card-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .admin-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #f8f9fa;
+        border-radius: 15px;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state-text {
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+    }
+    
+    .btn-dashboard-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-dashboard-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">Welcome, {{ user.username }}!</h1>
+<!-- Welcome Header -->
+<div class="dashboard-header">
+    <div class="container-fluid position-relative">
+        <h1 class="dashboard-welcome">
+            <i class="fas fa-hand-sparkles me-2"></i>
+            Welcome back, {{ user.username }}!
+        </h1>
+        <p class="dashboard-subtitle">Here's what's happening with your salon appointments</p>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Book Appointment</h5>
-                <p class="card-text">Schedule your next salon visit</p>
-                <a href="{% url 'appointment_create' %}" class="btn btn-primary">Book Now</a>
+<!-- Stats Cards -->
+<div class="row mb-5">
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-card-icon purple">
+                <i class="fas fa-calendar-check"></i>
             </div>
+            <div class="stat-card-value">{{ upcoming_count|default:0 }}</div>
+            <p class="stat-card-label">Upcoming Appointments</p>
         </div>
     </div>
-    
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">My Appointments</h5>
-                <p class="card-text">View and manage your appointments</p>
-                <a href="{% url 'appointment_list' %}" class="btn btn-primary">View</a>
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-card-icon green">
+                <i class="fas fa-check-circle"></i>
             </div>
+            <div class="stat-card-value">{{ completed_count|default:0 }}</div>
+            <p class="stat-card-label">Completed</p>
         </div>
     </div>
-    
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Services</h5>
-                <p class="card-text">Browse our salon services</p>
-                <a href="{% url 'service_list' %}" class="btn btn-primary">Browse</a>
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-card-icon orange">
+                <i class="fas fa-star"></i>
             </div>
+            <div class="stat-card-value">{{ total_services|default:25 }}</div>
+            <p class="stat-card-label">Available Services</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="stat-card-icon blue">
+                <i class="fas fa-crown"></i>
+            </div>
+            <div class="stat-card-value">VIP</div>
+            <p class="stat-card-label">Member Status</p>
         </div>
     </div>
 </div>
 
+<!-- Quick Actions -->
+<h2 class="section-title">Quick Actions</h2>
+<div class="row mb-5">
+    <div class="col-md-4 mb-4">
+        <a href="{% url 'appointment_create' %}" class="action-card">
+            <div class="action-card-icon">
+                <i class="fas fa-calendar-plus"></i>
+            </div>
+            <h5 class="action-card-title">Book Appointment</h5>
+            <p class="action-card-text">Schedule your next salon visit</p>
+        </a>
+    </div>
+    <div class="col-md-4 mb-4">
+        <a href="{% url 'appointment_list' %}" class="action-card">
+            <div class="action-card-icon">
+                <i class="fas fa-list-alt"></i>
+            </div>
+            <h5 class="action-card-title">My Appointments</h5>
+            <p class="action-card-text">View and manage appointments</p>
+        </a>
+    </div>
+    <div class="col-md-4 mb-4">
+        <a href="{% url 'service_list' %}" class="action-card">
+            <div class="action-card-icon">
+                <i class="fas fa-cut"></i>
+            </div>
+            <h5 class="action-card-title">Browse Services</h5>
+            <p class="action-card-text">Explore our salon services</p>
+        </a>
+    </div>
+</div>
+
+<!-- Upcoming Appointments -->
+<h2 class="section-title">Upcoming Appointments</h2>
+<div class="row mb-5">
+    <div class="col-lg-12">
+        {% if appointments %}
+            {% for appointment in appointments %}
+            <div class="appointment-card">
+                <div class="appointment-header">
+                    <h5 class="appointment-service">
+                        <i class="fas fa-scissors me-2"></i>{{ appointment.service.name }}
+                    </h5>
+                    <span class="appointment-status status-{{ appointment.status|lower }}">
+                        {{ appointment.status }}
+                    </span>
+                </div>
+                <div class="appointment-details">
+                    <div class="mb-2">
+                        <i class="far fa-calendar"></i>
+                        <strong>Date:</strong> {{ appointment.schedule.date|date:"F d, Y" }}
+                    </div>
+                    <div class="mb-2">
+                        <i class="far fa-clock"></i>
+                        <strong>Time:</strong> {{ appointment.schedule.time_slot }}
+                    </div>
+                    {% if appointment.staff %}
+                    <div class="mb-2">
+                        <i class="fas fa-user"></i>
+                        <strong>Stylist:</strong> {{ appointment.staff.user.get_full_name|default:appointment.staff.user.username }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="far fa-calendar"></i>
+                </div>
+                <p class="empty-state-text">No upcoming appointments</p>
+                <a href="{% url 'appointment_create' %}" class="btn-dashboard-primary">
+                    <i class="fas fa-plus me-2"></i>Book Your First Appointment
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Admin Section -->
 {% if user.role == 'Admin' %}
-<div class="row">
-    <div class="col-12">
-        <h3 class="mt-4 mb-3">Admin Quick Actions</h3>
-    </div>
-    <div class="col-md-3 mb-3">
-        <a href="{% url 'service_create' %}" class="btn btn-success w-100">Add Service</a>
-    </div>
-    <div class="col-md-3 mb-3">
-        <a href="{% url 'staff_create' %}" class="btn btn-success w-100">Add Staff</a>
-    </div>
-    <div class="col-md-3 mb-3">
-        <a href="{% url 'schedule_create' %}" class="btn btn-success w-100">Create Schedule</a>
-    </div>
-    <div class="col-md-3 mb-3">
-        <a href="/admin/" class="btn btn-dark w-100">Admin Panel</a>
+<div class="admin-section">
+    <h2 class="mb-4"><i class="fas fa-user-shield me-2"></i>Admin Panel</h2>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'service_create' %}" class="admin-card">
+                <div class="admin-card-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <h6 class="admin-card-title">Add Service</h6>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'staff_create' %}" class="admin-card">
+                <div class="admin-card-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h6 class="admin-card-title">Add Staff</h6>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'schedule_create' %}" class="admin-card">
+                <div class="admin-card-icon">
+                    <i class="far fa-calendar-plus"></i>
+                </div>
+                <h6 class="admin-card-title">Create Schedule</h6>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="/admin/" class="admin-card">
+                <div class="admin-card-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <h6 class="admin-card-title">Admin Panel</h6>
+            </a>
+        </div>
     </div>
 </div>
 {% endif %}

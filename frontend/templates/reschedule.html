@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reschedule Appointment - Nextdoor Saloon{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reschedule-header {
+        background: var(--color-primary);
+        color: white;
+        padding: 50px 0;
+        margin: -20px -15px 40px;
+        text-align: center;
+        border-radius: 0 0 30px 30px;
+    }
+    
+    .reschedule-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .reschedule-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .reschedule-card {
+        background: var(--color-card-bg);
+        border-radius: var(--radius-3xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .current-details {
+        background: linear-gradient(135deg, #F4EAD5, #E8DDD6);
+        border: 2px solid #D4A574;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .current-details h5 {
+        color: #8B6F47;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .current-detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #D4A57450;
+    }
+    
+    .current-detail-item:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label-reschedule {
+        font-weight: 600;
+        color: #8B6F47;
+    }
+    
+    .detail-value-reschedule {
+        font-weight: 700;
+        color: #8B6F47;
+    }
+    
+    .reschedule-form-section {
+        padding: 40px;
+    }
+    
+    .form-group-reschedule {
+        margin-bottom: 25px;
+    }
+    
+    .form-label-reschedule {
+        font-weight: 700;
+        color: var(--color-foreground);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .form-label-reschedule i {
+        color: var(--color-primary);
+    }
+    
+    .form-select-reschedule {
+        width: 100%;
+        padding: 12px 18px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-select-reschedule:focus {
+        border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+    }
+    
+    .loading-indicator {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        color: #667eea;
+        margin-top: 10px;
+        font-weight: 600;
+    }
+    
+    .loading-indicator.active {
+        display: flex;
+    }
+    
+    .spinner-small {
+        width: 20px;
+        height: 20px;
+        border: 3px solid #667eea30;
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .action-buttons-reschedule {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .btn-reschedule-confirm {
+        flex: 1;
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .btn-reschedule-confirm:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-reschedule-cancel {
+        flex: 1;
+        padding: 15px 30px;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .btn-reschedule-cancel:hover {
+        background: #f8f9fa;
+        color: #667eea;
+    }
+    
+    @media (max-width: 768px) {
+        .reschedule-header h1 {
+            font-size: 2rem;
+        }
+        
+        .reschedule-form-section {
+            padding: 25px 20px;
+        }
+        
+        .action-buttons-reschedule {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reschedule-header">
+    <div class="container">
+        <h1>🔄 Reschedule Appointment</h1>
+        <p>Choose a new date and time for your appointment</p>
+    </div>
+</div>
+<div class="container reschedule-container">
+    <div class="reschedule-card">
+        <div class="reschedule-form-section">
+            <div class="current-details">
+                <h5><i class="bi bi-info-circle-fill"></i> Current Appointment Details</h5>
+                <div class="current-detail-item">
+                    <span class="detail-label-reschedule">Service:</span>
+                    <span class="detail-value-reschedule">{{ appointment.service.name }}</span>
+                </div>
+                <div class="current-detail-item">
+                    <span class="detail-label-reschedule">Stylist:</span>
+                    <span class="detail-value-reschedule">{{ appointment.staff.user.get_full_name|default:appointment.staff.user.username }}</span>
+                </div>
+                <div class="current-detail-item">
+                    <span class="detail-label-reschedule">Current Date & Time:</span>
+                    <span class="detail-value-reschedule">{{ appointment.schedule.date }} at {{ appointment.schedule.time_slot }}</span>
+                </div>
+                <div class="current-detail-item">
+                    <span class="detail-label-reschedule">Status:</span>
+                    <span class="detail-value-reschedule">{{ appointment.status }}</span>
+                </div>
+            </div>
+
+            <form method="post" id="rescheduleForm">
+                {% csrf_token %}
+                
+                <div class="form-group-reschedule">
+                    <label for="staff_id" class="form-label-reschedule">
+                        <i class="bi bi-person-circle"></i> Select Staff Member *
+                    </label>
+                    <select name="staff_id" id="staff_id" class="form-select-reschedule" required>
+                        <option value="">-- Choose a staff member --</option>
+                        {% for staff in staff_members %}
+                            <option value="{{ staff.id }}" {% if staff.id == appointment.staff.id %}selected{% endif %}>
+                                {{ staff.user.get_full_name|default:staff.user.username }} - {{ staff.specialization }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group-reschedule">
+                    <label for="schedule_id" class="form-label-reschedule">
+                        <i class="bi bi-calendar-event"></i> Select New Date & Time *
+                    </label>
+                    <select name="schedule_id" id="schedule_id" class="form-select-reschedule" required>
+                        <option value="">-- Select a staff member first --</option>
+                    </select>
+                    <div id="schedule-loading" class="loading-indicator">
+                        <div class="spinner-small"></div>
+                        <span>Loading available time slots...</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons-reschedule">
+                    <button type="submit" class="btn-reschedule-confirm">
+                        <i class="bi bi-check-circle-fill"></i> Confirm Reschedule
+                    </button>
+                    <a href="{% url 'appointment_detail' appointment.id %}" class="btn-reschedule-cancel">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const staffSelect = document.getElementById('staff_id');
+    const scheduleSelect = document.getElementById('schedule_id');
+    const scheduleLoading = document.getElementById('schedule-loading');
+
+    staffSelect.addEventListener('change', function() {
+        const staffId = this.valueadd('active');
+        scheduleSelect.innerHTML = '<option value="">Loading...</option>';
+        scheduleSelect.disabled = true;
+
+        // Fetch available schedules for the selected staff
+        fetch(`/api/schedules/?staff_id=${staffId}`)
+            .then(response => response.json())
+            .then(data => {
+                scheduleLoading.classList.remove('active');
+                scheduleSelect.disabled = false;
+                
+                if (data.length === 0) {
+                    scheduleSelect.innerHTML = '<option value="">No available time slots</option>';
+                    return;
+                }
+
+                scheduleSelect.innerHTML = '<option value="">-- Select Date & Time --</option>';
+                data.forEach(schedule => {
+                    const option = document.createElement('option');
+                    option.value = schedule.id;
+                    option.textContent = `${schedule.date} - ${schedule.time_slot}`;
+                    scheduleSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching schedules:', error);
+                scheduleLoading.classList.remove('active');
+                scheduleSelect.disabled = false;
+                scheduleSelect.innerHTML = '<option value="">Error loading time slots</option>';
+            });
+    });
+});
+</script>
+{% endblock %}lots</option>';
+                    return;
+                }
+
+                scheduleSelect.innerHTML = '<option value="">-- Select Date & Time --</option>';
+                data.forEach(schedule => {
+                    const option = document.createElement('option');
+                    option.value = schedule.id;
+                    option.textContent = `${schedule.date} - ${schedule.time_slot}`;
+                    scheduleSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching schedules:', error);
+                scheduleLoading.classList.add('d-none');
+                scheduleSelect.disabled = false;
+                scheduleSelect.innerHTML = '<option value="">Error loading time slots</option>';
+            });
+    });
+});
+</script>
+{% endblock %}

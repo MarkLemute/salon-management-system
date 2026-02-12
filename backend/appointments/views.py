@@ -1,19 +1,42 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from .models import Appointment, Payment
 from backend.services.models import Service
 from backend.staff.models import Staff
 from backend.schedules.models import Schedule
+from backend.accounts.decorators import staff_or_admin_required
+from .validators import (
+    validate_schedule_availability,
+    validate_no_double_booking,
+    validate_reschedule_eligibility
+)
 
 
 @login_required
 def appointment_list(request):
-    """Display user's appointments."""
+    """Display user's appointments based on role."""
     if request.user.role == 'Admin':
-        appointments = Appointment.objects.all()
+        # Admin sees all appointments
+        appointments = Appointment.objects.select_related(
+            'user', 'service', 'staff__user', 'schedule__staff'
+        ).all()
+    elif request.user.role == 'Staff':
+        # Staff sees appointments assigned to them
+        try:
+            staff_profile = Staff.objects.get(user=request.user)
+            appointments = Appointment.objects.select_related(
+                'user', 'service', 'staff__user', 'schedule__staff'
+            ).filter(staff=staff_profile)
+        except Staff.DoesNotExist:
+            messages.error(request, 'Staff profile not found.')
+            appointments = Appointment.objects.none()
     else:
-        appointments = Appointment.objects.filter(user=request.user)
+        # Customers see their own appointments
+        appointments = Appointment.objects.select_related(
+            'service', 'staff__user', 'schedule__staff'
+        ).filter(user=request.user)
     
     return render(request, 'appointments.html', {'appointments': appointments})
 
@@ -31,14 +54,12 @@ def appointment_create(request):
         staff = get_object_or_404(Staff, id=staff_id)
         schedule = get_object_or_404(Schedule, id=schedule_id)
         
-        # Check if the schedule is available
-        if not schedule.availability_status:
-            messages.error(request, 'This time slot is not available.')
-            return redirect('appointment_create')
-        
-        # Check for double booking
-        if Appointment.objects.filter(schedule=schedule, status__in=['Pending', 'Confirmed']).exists():
-            messages.error(request, 'This time slot is already booked.')
+        # Validate schedule availability
+        try:
+            validate_schedule_availability(schedule)
+            validate_no_double_booking(schedule)
+        except ValidationError as e:
+            messages.error(request, str(e))
             return redirect('appointment_create')
         
         # Create appointment
@@ -64,7 +85,12 @@ def appointment_create(request):
 @login_required
 def appointment_detail(request, appointment_id):
     """Display appointment details."""
-    appointment = get_object_or_404(Appointment, id=appointment_id)
+    appointment = get_object_or_404(
+        Appointment.objects.select_related(
+            'user', 'service', 'staff__user', 'schedule__staff'
+        ),
+        id=appointment_id
+    )
     
     # Check permission
     if request.user.role not in ['Admin', 'Staff'] and appointment.user != request.user:
@@ -99,12 +125,9 @@ def appointment_cancel(request, appointment_id):
     return redirect('appointment_list')
 
 
-@login_required
+@staff_or_admin_required
 def appointment_update_status(request, appointment_id):
     """Update appointment status (Admin/Staff only)."""
-    if request.user.role not in ['Admin', 'Staff']:
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('appointment_list')
     
     appointment = get_object_or_404(Appointment, id=appointment_id)
     
@@ -150,3 +173,59 @@ def process_payment(request, appointment_id):
         return redirect('appointment_detail', appointment_id=appointment_id)
     
     return render(request, 'payment.html', {'appointment': appointment})
+
+
+@login_required
+def appointment_reschedule(request, appointment_id):
+    """Reschedule an appointment."""
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+    
+    # Check permission
+    if request.user.role != 'Admin' and appointment.user != request.user:
+        messages.error(request, 'You do not have permission to reschedule this appointment.')
+        return redirect('appointment_list')
+    
+    if appointment.status in ['Cancelled', 'Completed']:
+        messages.error(request, f'Cannot reschedule {appointment.status.lower()} appointments.')
+        return redirect('appointment_detail', appointment_id=appointment_id)
+    
+    if request.method == 'POST':
+        staff_id = request.POST.get('staff_id')
+        schedule_id = request.POST.get('schedule_id')
+        
+        staff = get_object_or_404(Staff, id=staff_id)
+        new_schedule = get_object_or_404(Schedule, id=schedule_id)
+        
+        # Validate using validators
+        try:
+            validate_schedule_availability(new_schedule)
+            validate_no_double_booking(new_schedule, exclude_appointment_id=appointment.id)
+        except ValidationError as e:
+            messages.error(request, str(e))
+            return redirect('appointment_reschedule', appointment_id=appointment_id)
+        
+        # Make old schedule available
+        old_schedule = appointment.schedule
+        old_schedule.availability_status = True
+        old_schedule.save()
+        
+        # Update appointment
+        appointment.staff = staff
+        appointment.schedule = new_schedule
+        appointment.save()
+        
+        # Mark new schedule as unavailable
+        new_schedule.availability_status = False
+        new_schedule.save()
+        
+        messages.success(request, 'Appointment rescheduled successfully!')
+        return redirect('appointment_detail', appointment_id=appointment.id)
+    
+    # Get available staff and schedules
+    staff_members = Staff.objects.filter(is_available=True)
+    
+    context = {
+        'appointment': appointment,
+        'staff_members': staff_members,
+    }
+    return render(request, 'reschedule.html', context)

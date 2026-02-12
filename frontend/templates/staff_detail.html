@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ staff.user.get_full_name|default:staff.user.username }} - Staff Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    .page-header {
+        background: var(--color-primary);
+        padding: 50px 0;
+        border-radius: 15px;
+        color: white;
+        margin-bottom: 30px;
+    }
+    
+    .staff-profile {
+        background: var(--color-card-bg);
+        border-radius: var(--radius-2xl);
+        padding: 30px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 20px;
+    }
+    
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .profile-info h2 {
+        color: var(--color-foreground);
+        font-family: var(--font-heading);
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    
+    .specialization {
+        color: var(--color-primary);
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .status-badge {
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .status-available {
+        background: #D9E4D5;
+        color: #4A5C45;
+    }
+    
+    .status-unavailable {
+        background: #E8DDD6;
+        color: #7A6256;
+    }
+    
+    .info-row {
+        display: flex;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #847A71;
+        width: 150px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .info-value {
+        color: var(--color-foreground);
+        flex: 1;
+    }
+    
+    .services-section {
+        background: var(--color-muted-bg);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .service-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        background: var(--color-card-bg);
+        border: 2px solid var(--color-primary);
+        color: var(--color-primary);
+        border-radius: 20px;
+        font-weight: 600;
+        margin: 5px;
+        transition: all var(--transition-base);
+    }
+    
+    .service-badge:hover {
+        background: var(--color-primary);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <a href="{% url 'staff_list' %}" class="btn btn-light mb-3">
+            <i class="fas fa-arrow-left me-2"></i>Back to Staff List
+        </a>
+        <h1><i class="fas fa-user-tie me-2"></i>Staff Profile</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="staff-profile">
+                <div class="profile-header">
+                    <div class="profile-info">
+                        <h2>{{ staff.user.get_full_name|default:staff.user.username }}</h2>
+                        <div class="specialization">{{ staff.specialization }}</div>
+                    </div>
+                    <span class="status-badge {% if staff.is_available %}status-available{% else %}status-unavailable{% endif %}">
+                        {% if staff.is_available %}
+                            <i class="fas fa-check-circle"></i> Available
+                        {% else %}
+                            <i class="fas fa-times-circle"></i> Unavailable
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-user"></i> Username
+                    </div>
+                    <div class="info-value">{{ staff.user.username }}</div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </div>
+                    <div class="info-value">{{ staff.user.email }}</div>
+                </div>
+                
+                {% if staff.user.phone %}
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-phone"></i> Phone
+                    </div>
+                    <div class="info-value">{{ staff.user.phone }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-calendar"></i> Joined
+                    </div>
+                    <div class="info-value">{{ staff.created_at|date:"F d, Y" }}</div>
+                </div>
+                
+                {% if staff.bio %}
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-info-circle"></i> Bio
+                    </div>
+                    <div class="info-value">{{ staff.bio }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="services-section">
+                    <h4><i class="fas fa-scissors me-2"></i>Assigned Services</h4>
+                    {% if services %}
+                        <div class="mt-3">
+                            {% for staff_service in services %}
+                                <span class="service-badge">{{ staff_service.service.name }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mt-3 mb-0">No services assigned yet</p>
+                    {% endif %}
+                    
+                    {% if user.role == 'Admin' %}
+                    <div class="mt-3">
+                        <a href="{% url 'assign_service' staff.id %}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-2"></i>Assign Service
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="staff-profile">
+                <h4><i class="fas fa-cog me-2"></i>Actions</h4>
+                <div class="d-grid gap-2 mt-3">
+                    {% if user.role == 'Admin' %}
+                    <a href="{% url 'assign_service' staff.id %}" class="btn btn-success">
+                        <i class="fas fa-plus-circle me-2"></i>Assign Service
+                    </a>
+                    <a href="{% url 'schedule_create' %}" class="btn btn-info">
+                        <i class="fas fa-calendar-plus me-2"></i>Create Schedule
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'staff_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

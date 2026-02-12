@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Staff Member - Nextdoor Saloon{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    .page-header {
+        background: var(--color-primary);
+        padding: 40px 0;
+        border-radius: 15px;
+        color: white;
+        margin-bottom: 30px;
+    }
+    
+    .form-card {
+        background: var(--color-card-bg);
+        border-radius: var(--radius-2xl);
+        padding: 40px;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .form-section {
+        margin-bottom: 25px;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--color-foreground);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid var(--color-border);
+        border-radius: 10px;
+        padding: 12px 15px;
+        transition: all var(--transition-base);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 0.2rem rgba(140, 154, 132, 0.15);
+    }
+    
+    .btn-submit {
+        background: var(--color-interactive);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all var(--transition-base);
+        width: 100%;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        color: white;
+        background: #A96A58;
+    }
+    
+    .btn-cancel {
+        background: var(--color-muted-bg);
+        color: #847A71;
+        border: 2px solid var(--color-border);
+        padding: 15px 40px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all var(--transition-base);
+        width: 100%;
+    }
+    
+    .btn-cancel:hover {
+        background: var(--color-secondary);
+        color: var(--color-foreground);
+    }
+    
+    .info-box {
+        background: #E6EBE4;
+        border-left: 4px solid var(--color-primary);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    
+    .info-box i {
+        color: var(--color-primary);
+    }
+    
+    .warning-box {
+        background: #F4EAD5;
+        border-left: 4px solid #D4A574;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    
+    .warning-box i {
+        color: #D4A574;
+    }
+    }
+    
+    .warning-box i {
+        color: #ffc107;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-user-plus me-2"></i>Add New Staff Member</h1>
+        <p class="mb-0">Create a new staff profile and assign them to your team</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% if staff_users %}
+                <form method="POST" class="form-card">
+                    {% csrf_token %}
+                    
+                    <div class="info-box">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> You can only create staff profiles for users who already have a "Staff" role. 
+                        <a href="/admin/">Go to Django Admin</a> to create new Staff users first.
+                    </div>
+                    
+                    <!-- User Selection -->
+                    <div class="form-section">
+                        <label for="user_id" class="form-label">
+                            <i class="fas fa-user"></i> Select User Account
+                        </label>
+                        <select class="form-select" id="user_id" name="user_id" required>
+                            <option value="">Choose a staff user...</option>
+                            {% for user in staff_users %}
+                                <option value="{{ user.id }}">
+                                    {{ user.get_full_name|default:user.username }} ({{ user.email }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Select the user account that will become a staff member</small>
+                    </div>
+                    
+                    <!-- Specialization -->
+                    <div class="form-section">
+                        <label for="specialization" class="form-label">
+                            <i class="fas fa-award"></i> Specialization
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="specialization" 
+                            name="specialization" 
+                            placeholder="e.g., Barber, Hair Stylist, Nail Technician"
+                            required
+                        >
+                        <small class="text-muted">What is this staff member's area of expertise?</small>
+                    </div>
+                    
+                    <!-- Bio -->
+                    <div class="form-section">
+                        <label for="bio" class="form-label">
+                            <i class="fas fa-info-circle"></i> Bio (Optional)
+                        </label>
+                        <textarea 
+                            class="form-control" 
+                            id="bio" 
+                            name="bio" 
+                            rows="4"
+                            placeholder="Brief description of experience and qualifications..."
+                        ></textarea>
+                        <small class="text-muted">This will be displayed on their profile</small>
+                    </div>
+                    
+                    <!-- Submit Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'staff_list' %}" class="btn btn-cancel">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button type="submit" class="btn btn-submit">
+                                <i class="fas fa-check me-2"></i>Create Staff Member
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <div class="form-card text-center">
+                    <div class="warning-box">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>No Staff Users Available</strong>
+                    </div>
+                    
+                    <i class="fas fa-users" style="font-size: 4rem; color: #ccc; margin: 20px 0;"></i>
+                    <h3>No Users with Staff Role Found</h3>
+                    <p class="text-muted mb-4">
+                        Before creating a staff profile, you need to create a user account with the "Staff" role.
+                    </p>
+                    
+                    <div class="alert alert-info text-start">
+                        <h5><i class="fas fa-lightbulb me-2"></i>Quick Steps:</h5>
+                        <ol class="mb-0">
+                            <li>Go to <a href="/admin/" target="_blank">Django Admin</a></li>
+                            <li>Click on "Users" → "Add User"</li>
+                            <li>Create the user account</li>
+                            <li>Set their <strong>Role</strong> to <strong>"Staff"</strong></li>
+                            <li>Save and come back here</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="/admin/" class="btn btn-primary-custom me-2" target="_blank">
+                            <i class="fas fa-external-link-alt me-2"></i>Go to Admin Panel
+                        </a>
+                        <a href="{% url 'staff_list' %}" class="btn btn-cancel">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Staff List
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

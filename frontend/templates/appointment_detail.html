@@ -1,0 +1,497 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Appointment Details - Nextdoor Saloon{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-header {
+        background: var(--color-primary);
+        color: white;
+        padding: 50px 0;
+        margin: -20px -15px 40px;
+        text-align: center;
+        border-radius: 0 0 30px 30px;
+    }
+    
+    .detail-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .appointment-id {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 600;
+    }
+    
+    .detail-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .detail-card {
+        background: var(--color-card-bg);
+        border-radius: var(--radius-3xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .detail-card-header {
+        background: var(--color-primary);
+        padding: 30px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .service-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .service-icon-large {
+        width: 70px;
+        height: 70px;
+        background: var(--color-card-bg);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .service-details h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .service-price {
+        font-size: 1.3rem;
+        opacity: 0.95;
+    }
+    
+    .status-badge-large {
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        background: var(--color-card-bg);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .status-badge-large.pending {
+        color: #8B6F47;
+    }
+    
+    .status-badge-large.confirmed {
+        color: #4A5C45;
+    }
+    
+    .status-badge-large.completed {
+        color: #5A6A56;
+    }
+    
+    .status-badge-large.cancelled {
+        color: #7A6256;
+    }
+    
+    .detail-card-body {
+        padding: 40px;
+    }
+    
+    .detail-section {
+        margin-bottom: 40px;
+    }
+    
+    .detail-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        font-family: var(--font-heading);
+        color: var(--color-foreground);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--color-border);
+    }
+    
+    .section-title i {
+        color: var(--color-primary);
+    }
+    
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+    }
+    
+    .detail-item {
+        background: var(--color-muted-bg);
+        padding: 20px;
+        border-radius: 15px;
+        border-left: 4px solid var(--color-primary);
+    }
+    
+    .detail-label {
+        font-size: 0.9rem;
+        color: #847A71;
+        margin-bottom: 5px;
+    }
+    
+    .detail-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--color-foreground);
+    }
+        color: #847A71;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .detail-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--color-foreground);
+    }
+    
+    .notes-section {
+        background: #F4EAD5;
+        border: 2px solid #D4A574;
+        border-radius: 15px;
+        padding: 20px;
+    }
+    
+    .notes-section h4 {
+        color: #8B6F47;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    
+    .btn-action-large {
+        padding: 15px 35px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border: none;
+        transition: all var(--transition-base);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .btn-back-list {
+        background: var(--color-secondary);
+        color: var(--color-foreground);
+    }
+    
+    .btn-back-list:hover {
+        background: #CFC3B8;
+        transform: translateY(-2px);
+        color: var(--color-foreground);
+    }
+    
+    .btn-reschedule-large {
+        background: #D4A574;
+        color: white;
+    }
+    
+    .btn-reschedule-large:hover {
+        background: #C59562;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-complete-large {
+        background: var(--color-primary);
+        color: white;
+    }
+    
+    .btn-complete-large:hover {
+        background: #0f877c;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-cancel-large {
+        background: #B8917A;
+        color: white;
+    }
+    
+    .btn-cancel-large:hover {
+        background: #A68068;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .timeline-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .timeline-badge.past {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .timeline-badge.today {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .timeline-badge.upcoming {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    @media (max-width: 768px) {
+        .detail-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .detail-card-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .service-info {
+            flex-direction: column;
+        }
+        
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-action-large {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-header">
+    <div class="container">
+        <h1>📋 Appointment Details</h1>
+        <div class="appointment-id">Booking ID: #{{ appointment.id|stringformat:"05d" }}</div>
+    </div>
+</div>
+
+<div class="container detail-container">
+    <div class="detail-card">
+        <div class="detail-card-header">
+            <div class="service-info">
+                <div class="service-icon-large">
+                    {% if 'Hair' in appointment.service.name or 'Braid' in appointment.service.name %}
+                        ✂️
+                    {% elif 'Nail' in appointment.service.name or 'Manicure' in appointment.service.name or 'Pedicure' in appointment.service.name %}
+                        💅
+                    {% elif 'Facial' in appointment.service.name or 'Makeup' in appointment.service.name %}
+                        💆
+                    {% else %}
+                        ✨
+                    {% endif %}
+                </div>
+                <div class="service-details">
+                    <h2>{{ appointment.service.name }}</h2>
+                    <div class="service-price">${{ appointment.service.price }}</div>
+                </div>
+            </div>
+            <div class="status-badge-large {{ appointment.status|lower }}">
+                {{ appointment.status }}
+            </div>
+        </div>
+        
+        <div class="detail-card-body">
+            <!-- Appointment Information -->
+            <div class="detail-section">
+                <h3 class="section-title">
+                    <i class="bi bi-calendar-event"></i> Appointment Information
+                </h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-calendar3"></i> Date
+                        </div>
+                        <div class="detail-value">{{ appointment.schedule.date|date:"F d, Y" }}</div>
+                        {% now "Y-m-d" as today %}
+                        <div class="mt-2">
+                            {% if appointment.schedule.date|date:"Y-m-d" < today %}
+                                <span class="timeline-badge past">
+                                    <i class="bi bi-check-circle-fill"></i> Past
+                                </span>
+                            {% elif appointment.schedule.date|date:"Y-m-d" == today %}
+                                <span class="timeline-badge today">
+                                    <i class="bi bi-circle-fill"></i> Today
+                                </span>
+                            {% else %}
+                                <span class="timeline-badge upcoming">
+                                    <i class="bi bi-arrow-right-circle-fill"></i> Upcoming
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-clock"></i> Time
+                        </div>
+                        <div class="detail-value">{{ appointment.schedule.time_slot }}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-hourglass-split"></i> Duration
+                        </div>
+                        <div class="detail-value">{{ appointment.service.duration }} minutes</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-person-circle"></i> Stylist
+                        </div>
+                        <div class="detail-value">{{ appointment.staff.user.get_full_name|default:appointment.staff.user.username }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Service Details -->
+            <div class="detail-section">
+                <h3 class="section-title">
+                    <i class="bi bi-info-circle"></i> Service Details
+                </h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-scissors"></i> Service Name
+                        </div>
+                        <div class="detail-value">{{ appointment.service.name }}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-currency-dollar"></i> Price
+                        </div>
+                        <div class="detail-value">${{ appointment.service.price }}</div>
+                    </div>
+                </div>
+                
+                {% if appointment.service.description %}
+                <div class="mt-3">
+                    <p class="text-muted">{{ appointment.service.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Additional Notes -->
+            {% if appointment.notes %}
+            <div class="detail-section">
+                <h3 class="section-title">
+                    <i class="bi bi-chat-left-text"></i> Additional Notes
+                </h3>
+                <div class="notes-section">
+                    <p class="mb-0">{{ appointment.notes }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Booking Information -->
+            <div class="detail-section">
+                <h3 class="section-title">
+                    <i class="bi bi-receipt"></i> Booking Information
+                </h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-clock-history"></i> Booked On
+                        </div>
+                        <div class="detail-value">{{ appointment.created_at|date:"M d, Y H:i" }}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="bi bi-arrow-repeat"></i> Last Updated
+                        </div>
+                        <div class="detail-value">{{ appointment.updated_at|date:"M d, Y H:i" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{% url 'appointment_list' %}" class="btn-action-large btn-back-list">
+                    <i class="bi bi-arrow-left-circle"></i> Back to Appointments
+                </a>
+                
+                {% if user.role == 'Staff' or user.role == 'Admin' %}
+                    {% if appointment.status == 'Pending' or appointment.status == 'Confirmed' %}
+                        <button type="button" class="btn-action-large btn-complete-large" 
+                                onclick="if(confirm('Mark this appointment as completed?')) { document.getElementById('complete-form').submit(); }">
+                            <i class="bi bi-check-circle"></i> Mark as Completed
+                        </button>
+                        <form id="complete-form" method="POST" action="{% url 'appointment_update_status' appointment.id %}" class="hidden-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="Completed">
+                        </form>
+                    {% endif %}
+                {% endif %}
+                
+                {% if appointment.status == 'Pending' or appointment.status == 'Confirmed' %}
+                    <a href="{% url 'appointment_reschedule' appointment.id %}" class="btn-action-large btn-reschedule-large">
+                        <i class="bi bi-arrow-repeat"></i> Reschedule
+                    </a>
+                    <button type="button" class="btn-action-large btn-cancel-large" 
+                            onclick="if(confirm('Are you sure you want to cancel this appointment?')) { document.getElementById('cancel-form').submit(); }">
+                        <i class="bi bi-x-circle"></i> Cancel Appointment
+                    </button>
+                    <form id="cancel-form" method="POST" action="{% url 'appointment_cancel' appointment.id %}" class="hidden-form">
+                        {% csrf_token %}
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hidden-form {
+        display: none;
+    }
+</style>
+{% endblock %}

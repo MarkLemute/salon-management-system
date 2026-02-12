@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from .models import Schedule
 from backend.staff.models import Staff
+from backend.accounts.decorators import admin_required
 
 
 def schedule_list(request):
@@ -32,12 +33,9 @@ def schedule_list(request):
     })
 
 
-@login_required
+@admin_required
 def schedule_create(request):
     """Create a new schedule (Admin only)."""
-    if request.user.role != 'Admin':
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('schedule_list')
     
     if request.method == 'POST':
         staff_id = request.POST.get('staff_id')
@@ -76,12 +74,9 @@ def schedule_create(request):
     })
 
 
-@login_required
+@admin_required
 def schedule_bulk_create(request):
     """Create schedules in bulk for a staff member (Admin only)."""
-    if request.user.role != 'Admin':
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('schedule_list')
     
     if request.method == 'POST':
         staff_id = request.POST.get('staff_id')
@@ -131,13 +126,9 @@ def schedule_bulk_create(request):
     })
 
 
-@login_required
+@admin_required
 def schedule_delete(request, schedule_id):
     """Delete a schedule (Admin only)."""
-    if request.user.role != 'Admin':
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('schedule_list')
-    
     schedule = get_object_or_404(Schedule, id=schedule_id)
     
     # Check if schedule has appointments

@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Members - Nextdoor Saloon{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    .page-header {
+        background: var(--color-primary);
+        padding: 40px 0;
+        border-radius: 15px;
+        color: white;
+        margin-bottom: 30px;
+    }
+    
+    .staff-card {
+        background: var(--color-card-bg);
+        border-radius: var(--radius-2xl);
+        padding: 25px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 20px;
+        transition: all var(--transition-base);
+        border-left: 5px solid var(--color-primary);
+    }
+    
+    .staff-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-3px);
+    }
+    
+    .staff-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .staff-name {
+        font-size: 1.4rem;
+        font-weight: 700;
+        font-family: var(--font-heading);
+        color: var(--color-foreground);
+        margin: 0;
+    }
+    
+    .staff-specialization {
+        color: var(--color-primary);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    .staff-status {
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-available {
+        background: #D9E4D5;
+        color: #4A5C45;
+    }
+    
+    .status-unavailable {
+        background: #E8DDD6;
+        color: #7A6256;
+    }
+    
+    .staff-bio {
+        color: #847A71;
+        margin: 10px 0;
+        font-size: 0.95rem;
+    }
+    
+    .staff-services {
+        margin-top: 15px;
+    }
+    
+    .service-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        background: var(--color-muted-bg);
+        color: var(--color-primary);
+        border-radius: 15px;
+        font-size: 0.85rem;
+        margin: 3px;
+    }
+    
+    .btn-primary-custom {
+        background: var(--color-interactive);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all var(--transition-base);
+    }
+    
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        background: #A96A58;
+        color: white;
+    }
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #ccc;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1><i class="fas fa-users me-2"></i>Staff Members</h1>
+                <p class="mb-0">Manage your salon team</p>
+            </div>
+            <div class="col-md-4 text-end">
+                {% if user.role == 'Admin' %}
+                <a href="{% url 'staff_create' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus me-2"></i>Add Staff Member
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    {% if staff_members %}
+        <div class="row">
+            {% for staff in staff_members %}
+            <div class="col-md-6 mb-4">
+                <div class="staff-card">
+                    <div class="staff-header">
+                        <div>
+                            <h3 class="staff-name">
+                                <i class="fas fa-user-tie me-2"></i>
+                                {{ staff.user.get_full_name|default:staff.user.username }}
+                            </h3>
+                            <div class="staff-specialization">{{ staff.specialization }}</div>
+                        </div>
+                        <span class="staff-status {% if staff.is_available %}status-available{% else %}status-unavailable{% endif %}">
+                            {% if staff.is_available %}
+                                <i class="fas fa-check-circle"></i> Available
+                            {% else %}
+                                <i class="fas fa-times-circle"></i> Unavailable
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    {% if staff.bio %}
+                    <p class="staff-bio">{{ staff.bio }}</p>
+                    {% endif %}
+                    
+                    <div class="staff-services">
+                        <strong><i class="fas fa-scissors me-2"></i>Services:</strong>
+                        {% if staff.staff_services.all %}
+                            {% for staff_service in staff.staff_services.all %}
+                                <span class="service-badge">{{ staff_service.service.name }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">No services assigned</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'staff_detail' staff.id %}" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        {% if user.role == 'Admin' %}
+                        <a href="{% url 'assign_service' staff.id %}" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-plus-circle"></i> Assign Service
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-users-slash"></i>
+            <h3>No Staff Members Yet</h3>
+            <p class="text-muted">Start building your team by adding staff members</p>
+            {% if user.role == 'Admin' %}
+            <a href="{% url 'staff_create' %}" class="btn btn-primary-custom mt-3">
+                <i class="fas fa-plus me-2"></i>Add Your First Staff Member
+            </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

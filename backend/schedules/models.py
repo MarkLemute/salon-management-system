@@ -8,9 +8,9 @@ class Schedule(models.Model):
     Defines time slots when staff members are available.
     """
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name='schedules')
-    date = models.DateField()
+    date = models.DateField(db_index=True)
     time_slot = models.CharField(max_length=50, help_text='e.g., 10:00-11:00')
-    availability_status = models.BooleanField(default=True)
+    availability_status = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

@@ -1,0 +1,531 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Dashboard - Nextdoor Saloon{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    .staff-header {
+        background: var(--color-primary);
+        padding: 50px 0;
+        border-radius: 20px;
+        color: white;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .staff-header::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -150px;
+        right: -150px;
+    }
+    
+    .staff-welcome {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .staff-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .stat-card {
+        background: var(--color-card-bg);
+        border-radius: var(--radius-3xl);
+        padding: 30px;
+        box-shadow: var(--shadow-md);
+        transition: all var(--transition-base);
+        border: 2px solid transparent;
+        height: 100%;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--color-primary);
+    }
+    
+    .stat-card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+    
+    .stat-card-icon.green {
+        background: var(--color-primary);
+        color: white;
+    }
+    
+    .stat-card-icon.blue {
+        background: #7A8876;
+        color: white;
+    }
+    
+    .stat-card-icon.orange {
+        background: var(--color-interactive);
+        color: white;
+    }
+    
+    .stat-card-icon.purple {
+        background: var(--color-secondary);
+        color: var(--color-foreground);
+    }
+    
+    .stat-card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--color-foreground);
+        margin-bottom: 5px;
+    }
+    
+    .stat-card-label {
+        color: #847A71;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        font-family: var(--font-heading);
+        color: var(--color-foreground);
+        margin-bottom: 25px;
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 30px;
+        background: var(--color-primary);
+        border-radius: 10px;
+    }
+    
+    .appointment-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 15px;
+        border-left: 5px solid #11998e;
+        transition: all 0.3s ease;
+    }
+    
+    .appointment-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        transform: translateX(5px);
+    }
+    
+    .appointment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .appointment-service {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+    
+    .appointment-status {
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-completed {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .appointment-details {
+        color: #666;
+        font-size: 0.95rem;
+    }
+    
+    .appointment-details i {
+        margin-right: 8px;
+        color: #11998e;
+    }
+    
+    .schedule-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+        border-left: 4px solid #11998e;
+        height: 100%;
+    }
+    
+    .schedule-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .nav-pills .nav-link {
+        color: #847A71;
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 10px 20px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .nav-pills .nav-link:hover {
+        background: #e9ecef;
+        border-color: var(--color-primary);
+    }
+    
+    .nav-pills .nav-link.active {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+    }
+    
+    .tab-content {
+        padding: 20px 0;
+    }
+    
+    .schedule-date {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 10px;
+    }
+    
+    .schedule-time {
+        color: #11998e;
+        font-weight: 600;
+    }
+    
+    .schedule-status {
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-available {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-booked {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+    
+    .empty-state p {
+        font-size: 1.1rem;
+    }
+    
+    .info-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #e3f2fd;
+        color: #1976d2;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <!-- Staff Header -->
+    <div class="staff-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="staff-welcome">Welcome, {{ staff_profile.user.get_full_name|default:staff_profile.user.username }}!</h1>
+                    <p class="staff-subtitle">
+                        <i class="fas fa-briefcase me-2"></i>{{ staff_profile.specialization }}
+                        {% if staff_profile.is_available %}
+                        <span class="ms-3"><i class="fas fa-circle text-success"></i> Available</span>
+                        {% else %}
+                        <span class="ms-3"><i class="fas fa-circle text-danger"></i> Unavailable</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-card-icon green">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-card-value">{{ todays_appointments.count }}</div>
+                <p class="stat-card-label">Today's Appointments</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-card-icon blue">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-card-value">{{ pending_appointments }}</div>
+                <p class="stat-card-label">Pending Appointments</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-card-icon orange">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-card-value">{{ completed_today }}</div>
+                <p class="stat-card-label">Completed Today</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="stat-card">
+                <div class="stat-card-icon purple">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-card-value">{{ total_appointments }}</div>
+                <p class="stat-card-label">Total Appointments</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Appointments -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="section-title">Today's Schedule</h2>
+            {% if todays_appointments %}
+                {% for appointment in todays_appointments %}
+                <div class="appointment-card">
+                    <div class="appointment-header">
+                        <div class="appointment-service">
+                            <i class="fas fa-cut me-2"></i>{{ appointment.service.name }}
+                        </div>
+                        <span class="appointment-status status-{{ appointment.status|lower }}">
+                            {{ appointment.status }}
+                        </span>
+                    </div>
+                    <div class="appointment-details">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <i class="fas fa-user"></i>
+                                <strong>Customer:</strong> {{ appointment.user.get_full_name|default:appointment.user.username }}
+                            </div>
+                            <div class="col-md-4">
+                                <i class="fas fa-clock"></i>
+                                <strong>Time:</strong> {{ appointment.schedule.time_slot }}
+                            </div>
+                            <div class="col-md-4">
+                                <i class="fas fa-tag"></i>
+                                <strong>Price:</strong> ${{ appointment.service.price }}
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                            {% if appointment.status == 'Pending' or appointment.status == 'Confirmed' %}
+                            <button type="button" class="btn btn-sm btn-success" 
+                                    onclick="if(confirm('Mark this appointment as completed?')) { document.getElementById('complete-form-{{ appointment.id }}').submit(); }">
+                                <i class="fas fa-check"></i> Complete
+                            </button>
+                            <form id="complete-form-{{ appointment.id }}" method="POST" action="{% url 'appointment_update_status' appointment.id %}" style="display: none;">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="Completed">
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-day"></i>
+                    <p>No appointments scheduled for today</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="section-title">Upcoming Appointments (Next 7 Days)</h2>
+            {% if upcoming_appointments %}
+                {% for appointment in upcoming_appointments %}
+                <div class="appointment-card">
+                    <div class="appointment-header">
+                        <div class="appointment-service">
+                            <i class="fas fa-cut me-2"></i>{{ appointment.service.name }}
+                        </div>
+                        <span class="appointment-status status-{{ appointment.status|lower }}">
+                            {{ appointment.status }}
+                        </span>
+                    </div>
+                    <div class="appointment-details">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <i class="fas fa-user"></i>
+                                <strong>Customer:</strong> {{ appointment.user.get_full_name|default:appointment.user.username }}
+                            </div>
+                            <div class="col-md-3">
+                                <i class="fas fa-calendar"></i>
+                                <strong>Date:</strong> {{ appointment.schedule.date }}
+                            </div>
+                            <div class="col-md-3">
+                                <i class="fas fa-clock"></i>
+                                <strong>Time:</strong> {{ appointment.schedule.time_slot }}
+                            </div>
+                            <div class="col-md-3">
+                                <i class="fas fa-tag"></i>
+                                <strong>Price:</strong> ${{ appointment.service.price }}
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>                            {% if appointment.status == 'Pending' or appointment.status == 'Confirmed' %}
+                            <button type="button" class="btn btn-sm btn-success" 
+                                    onclick="if(confirm('Mark this appointment as completed?')) { document.getElementById('complete-form-upcoming-{{ appointment.id }}').submit(); }">
+                                <i class="fas fa-check"></i> Complete
+                            </button>
+                            <form id="complete-form-upcoming-{{ appointment.id }}" method="POST" action="{% url 'appointment_update_status' appointment.id %}" style="display: none;">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="Completed">
+                            </form>
+                            {% endif %}                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-alt"></i>
+                    <p>No upcoming appointments in the next 7 days</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Week Schedule -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="section-title">Your Schedule (This Week)</h2>
+            {% if schedules_by_day %}
+                <!-- Day Tabs -->
+                <ul class="nav nav-pills mb-3" id="scheduleTab" role="tablist">
+                    {% for date, schedules in schedules_by_day %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if forloop.first %}active{% endif %}" 
+                                id="day-{{ forloop.counter }}-tab" 
+                                data-bs-toggle="pill" 
+                                data-bs-target="#day-{{ forloop.counter }}" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="day-{{ forloop.counter }}" 
+                                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                            <i class="fas fa-calendar-day me-1"></i>
+                            {{ date|date:"D, M j" }}
+                        </button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                
+                <!-- Tab Content -->
+                <div class="tab-content" id="scheduleTabContent">
+                    {% for date, schedules in schedules_by_day %}
+                    <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" 
+                         id="day-{{ forloop.counter }}" 
+                         role="tabpanel" 
+                         aria-labelledby="day-{{ forloop.counter }}-tab">
+                        <div class="row">
+                            {% for schedule in schedules %}
+                            <div class="col-md-4 col-lg-3 mb-3">
+                                <div class="schedule-card">
+                                    <div class="schedule-time mb-2">
+                                        <i class="fas fa-clock me-2"></i>{{ schedule.time_slot }}
+                                    </div>
+                                    {% if schedule.availability_status %}
+                                    <span class="schedule-status status-available">
+                                        <i class="fas fa-check-circle me-1"></i>Available
+                                    </span>
+                                    {% else %}
+                                    <span class="schedule-status status-booked">
+                                        <i class="fas fa-times-circle me-1"></i>Booked
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>No schedule set for this week</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

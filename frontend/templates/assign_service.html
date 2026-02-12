@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Assign Service - {{ staff.user.get_full_name|default:staff.user.username }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    .page-header {
+        background: var(--color-primary);
+        padding: 40px 0;
+        border-radius: 15px;
+        color: white;
+        margin-bottom: 30px;
+    }
+    
+    .form-card {
+        background: var(--color-card-bg);
+        border-radius: var(--radius-2xl);
+        padding: 40px;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .staff-info {
+        background: var(--color-muted-bg);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-left: 5px solid var(--color-primary);
+    }
+    
+    .staff-info h4 {
+        color: var(--color-foreground);
+        margin-bottom: 10px;
+    }
+    
+    .staff-info .specialization {
+        color: var(--color-primary);
+        font-weight: 600;
+    }
+    
+    .service-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .service-option {
+        border: 2px solid var(--color-border);
+        border-radius: 10px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        background: var(--color-card-bg);
+    }
+    
+    .service-option:hover {
+        border-color: var(--color-primary);
+        background: var(--color-muted-bg);
+        transform: translateY(-2px);
+    }
+    
+    .service-option input[type="radio"] {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+    
+    .service-option.assigned {
+        border-color: #B8917A;
+        background: #F4EAD5;
+        position: relative;
+    }
+    
+    .service-option.assigned::after {
+        content: "Already Assigned";
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #B8917A;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .service-name {
+        font-weight: 600;
+        color: var(--color-foreground);
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .service-details {
+        color: #847A71;
+        font-size: 0.9rem;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(17, 153, 142, 0.4);
+        color: white;
+    }
+    
+    .assigned-services {
+        background: #e3f2fd;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .assigned-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        background: white;
+        border: 2px solid #2196f3;
+        color: #2196f3;
+        border-radius: 20px;
+        font-weight: 600;
+        margin: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <a href="{% url 'staff_detail' staff.id %}" class="btn btn-light mb-3">
+            <i class="fas fa-arrow-left me-2"></i>Back to Staff Profile
+        </a>
+        <h1><i class="fas fa-plus-circle me-2"></i>Assign Service</h1>
+        <p class="mb-0">Choose a service to assign to this staff member</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="form-card">
+                <!-- Staff Info -->
+                <div class="staff-info">
+                    <h4><i class="fas fa-user-tie me-2"></i>{{ staff.user.get_full_name|default:staff.user.username }}</h4>
+                    <div class="specialization">{{ staff.specialization }}</div>
+                </div>
+                
+                <!-- Currently Assigned Services -->
+                {% if assigned_services %}
+                <div class="assigned-services">
+                    <h5><i class="fas fa-check-circle me-2"></i>Currently Assigned Services</h5>
+                    <div class="mt-3">
+                        {% for service_id in assigned_services %}
+                            {% for service in services %}
+                                {% if service.id == service_id %}
+                                    <span class="assigned-badge">{{ service.name }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Service Selection Form -->
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <h5 class="mb-3"><i class="fas fa-scissors me-2"></i>Select a Service to Assign</h5>
+                    
+                    <div class="service-grid">
+                        {% for service in services %}
+                        <label class="service-option {% if service.id in assigned_services %}assigned{% endif %}">
+                            <input 
+                                type="radio" 
+                                name="service_id" 
+                                value="{{ service.id }}"
+                                {% if service.id in assigned_services %}disabled{% endif %}
+                                required
+                            >
+                            <span class="service-name">{{ service.name }}</span>
+                            <span class="service-details">
+                                ${{ service.price }} • {{ service.duration }} mins
+                            </span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'staff_detail' staff.id %}" class="btn btn-outline-secondary" style="width: 100%; padding: 15px;">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button type="submit" class="btn btn-submit">
+                                <i class="fas fa-check me-2"></i>Assign Service
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

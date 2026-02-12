@@ -1,67 +1,149 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Book Appointment - Salon MS{% endblock %}
+{% block title %}Book Appointment - Nextdoor Saloon{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Book an Appointment</h1>
+<div class="booking-header">
+    <h1 class="booking-title">Book Your Appointment</h1>
+    <p class="booking-subtitle">Follow the steps below to schedule your salon service</p>
+</div>
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h3>Select Service & Schedule</h3>
+<!-- Progress Steps -->
+<div class="booking-steps">
+    <div class="step active" id="step-1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Choose Service</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step-2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Select Staff</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step-3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Pick Date & Time</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step-4">
+        <div class="step-circle">4</div>
+        <div class="step-label">Confirm</div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-8">
+        <div class="booking-card">
+            <div class="booking-card-header">
+                <i class="fas fa-calendar-check"></i>
+                <h3>Appointment Details</h3>
             </div>
-            <div class="card-body">
+            <div class="booking-card-body">
                 <form method="POST" id="bookingForm">
                     {% csrf_token %}
                     
-                    <div class="mb-3">
-                        <label for="service_id" class="form-label">Service</label>
-                        <select class="form-select" id="service_id" name="service_id" required>
-                            <option value="">Select a service</option>
+                    <!-- Service Selection -->
+                    <div class="form-section">
+                        <label for="service_id" class="booking-label">
+                            <i class="fas fa-scissors"></i> Select Service
+                        </label>
+                        <select class="booking-select" id="service_id" name="service_id" required>
+                            <option value="">Choose your desired service...</option>
                             {% for service in services %}
-                                <option value="{{ service.id }}" data-price="{{ service.price }}" data-duration="{{ service.duration }}">
+                                <option value="{{ service.id }}" data-price="{{ service.price }}" data-duration="{{ service.duration }}" data-description="{{ service.description }}">
                                     {{ service.name }} - ${{ service.price }} ({{ service.duration }} mins)
                                 </option>
                             {% endfor %}
                         </select>
+                        <small class="form-text text-muted">Select the service you'd like to book</small>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="staff_id" class="form-label">Staff Member</label>
-                        <select class="form-select" id="staff_id" name="staff_id" required>
-                            <option value="">Select staff</option>
+                    <!-- Staff Selection -->
+                    <div class="form-section">
+                        <label for="staff_id" class="booking-label">
+                            <i class="fas fa-user-tie"></i> Choose Staff Member
+                        </label>
+                        <div id="staff-loader" class="loader-container" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p>Loading available staff...</p>
+                        </div>
+                        <select class="booking-select" id="staff_id" name="staff_id" required disabled>
+                            <option value="">First, select a service above</option>
                         </select>
+                        <small class="form-text text-muted">Pick your preferred staff member</small>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="schedule_id" class="form-label">Date & Time</label>
-                        <select class="form-select" id="schedule_id" name="schedule_id" required>
-                            <option value="">Select date & time</option>
+                    <!-- Schedule Selection -->
+                    <div class="form-section">
+                        <label for="schedule_id" class="booking-label">
+                            <i class="fas fa-clock"></i> Select Date & Time
+                        </label>
+                        <div id="schedule-loader" class="loader-container" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p>Loading available time slots...</p>
+                        </div>
+                        <select class="booking-select" id="schedule_id" name="schedule_id" required disabled>
+                            <option value="">First, select staff above</option>
                         </select>
+                        <small class="form-text text-muted">Choose your preferred date and time</small>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="notes" class="form-label">Additional Notes (Optional)</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    <!-- Additional Notes -->
+                    <div class="form-section">
+                        <label for="notes" class="booking-label">
+                            <i class="fas fa-comment-dots"></i> Additional Notes (Optional)
+                        </label>
+                        <textarea class="booking-textarea" id="notes" name="notes" rows="3" placeholder="Any special requests or preferences..."></textarea>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary btn-lg w-100">Book Appointment</button>
+                    <!-- Submit Button -->
+                    <div class="form-section text-center">
+                        <button type="submit" class="booking-submit-btn" id="submitBtn" disabled>
+                            <i class="fas fa-check-circle"></i> Confirm Booking
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
     
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
+    <!-- Booking Summary Sidebar -->
+    <div class="col-lg-4">
+        <div class="booking-summary-card">
+            <div class="summary-header">
+                <i class="fas fa-clipboard-list"></i>
                 <h4>Booking Summary</h4>
             </div>
-            <div class="card-body">
-                <div id="booking-summary">
-                    <p class="text-muted">Select a service to see details</p>
+            <div class="summary-body" id="booking-summary">
+                <div class="summary-empty">
+                    <i class="fas fa-clipboard-check summary-icon"></i>
+                    <p>Your booking details will appear here</p>
+                    <small>Start by selecting a service</small>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Help Card -->
+        <div class="booking-help-card mt-4">
+            <div class="help-header">
+                <i class="fas fa-info-circle"></i> Need Help?
+            </div>
+            <div class="help-body">
+                <p>Having trouble booking?</p>
+                <ul>
+                    <li>Make sure you've selected all required fields</li>
+                    <li>Check that your chosen time slot is available</li>
+                    <li>Contact us if you need assistance</li>
+                </ul>
             </div>
         </div>
     </div>

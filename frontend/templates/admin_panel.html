@@ -1,116 +1,432 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Admin Panel - Salon MS{% endblock %}
+{% block title %}Admin Panel - Nextdoor Saloon{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 50px 0;
+        border-radius: 20px;
+        color: white;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .admin-header::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -150px;
+        right: -150px;
+    }
+    
+    .admin-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .admin-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .admin-stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .admin-stat-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200px;
+        height: 200px;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 50%;
+    }
+    
+    .admin-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        border-color: #2a5298;
+    }
+    
+    .admin-stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: white;
+    }
+    
+    .admin-stat-icon.services {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .admin-stat-icon.staff {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .admin-stat-icon.appointments {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .admin-stat-icon.schedules {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .admin-stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 5px;
+    }
+    
+    .admin-stat-label {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+    
+    .admin-stat-link {
+        display: inline-block;
+        padding: 8px 20px;
+        background: #f8f9fa;
+        color: #1a1a1a;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-stat-link:hover {
+        background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        color: white;
+    }
+    
+    .section-title-admin {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 25px;
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .section-title-admin::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 30px;
+        background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        border-radius: 10px;
+    }
+    
+    .quick-action-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+        border: 2px solid transparent;
+        color: #1a1a1a;
+    }
+    
+    .quick-action-card:hover {
+        background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        color: white;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(42, 82, 152, 0.3);
+    }
+    
+    .quick-action-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        display: block;
+    }
+    
+    .quick-action-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .appointments-table-wrapper {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .table-modern {
+        margin: 0;
+    }
+    
+    .table-modern thead {
+        background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        color: white;
+    }
+    
+    .table-modern thead th {
+        border: none;
+        padding: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .table-modern tbody tr {
+        transition: all 0.3s ease;
+    }
+    
+    .table-modern tbody tr:hover {
+        background: #f8f9fa;
+        transform: scale(1.01);
+    }
+    
+    .table-modern tbody td {
+        padding: 15px;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .status-badge {
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .status-badge.confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-badge.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-badge.completed {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-badge.cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .btn-view-admin {
+        padding: 6px 20px;
+        background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .btn-view-admin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(42, 82, 152, 0.3);
+        color: white;
+    }
+    
+    .empty-state-admin {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+    
+    .empty-state-admin i {
+        font-size: 4rem;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Admin Dashboard</h1>
+<!-- Admin Header -->
+<div class="admin-header">
+    <div class="container-fluid position-relative">
+        <h1 class="admin-title">
+            <i class="fas fa-user-shield me-2"></i>
+            Admin Dashboard
+        </h1>
+        <p class="admin-subtitle">Manage your salon operations from one central location</p>
+    </div>
+</div>
 
-<div class="row">
+<!-- Stats Cards -->
+<div class="row mb-5">
     <div class="col-md-3 mb-4">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h5 class="card-title">Services</h5>
-                <p class="card-text display-4">{{ total_services }}</p>
-                <a href="{% url 'service_list' %}" class="btn btn-light">Manage</a>
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon services">
+                <i class="fas fa-cut"></i>
             </div>
+            <div class="admin-stat-value">{{ total_services }}</div>
+            <div class="admin-stat-label">Total Services</div>
+            <a href="{% url 'service_list' %}" class="admin-stat-link">
+                <i class="fas fa-arrow-right me-1"></i> Manage
+            </a>
         </div>
     </div>
-    
     <div class="col-md-3 mb-4">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title">Staff</h5>
-                <p class="card-text display-4">{{ total_staff }}</p>
-                <a href="{% url 'staff_list' %}" class="btn btn-light">Manage</a>
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon staff">
+                <i class="fas fa-users"></i>
             </div>
+            <div class="admin-stat-value">{{ total_staff }}</div>
+            <div class="admin-stat-label">Staff Members</div>
+            <a href="{% url 'staff_list' %}" class="admin-stat-link">
+                <i class="fas fa-arrow-right me-1"></i> Manage
+            </a>
         </div>
     </div>
-    
     <div class="col-md-3 mb-4">
-        <div class="card text-white bg-warning">
-            <div class="card-body">
-                <h5 class="card-title">Appointments</h5>
-                <p class="card-text display-4">{{ total_appointments }}</p>
-                <a href="{% url 'appointment_list' %}" class="btn btn-light">Manage</a>
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon appointments">
+                <i class="fas fa-calendar-check"></i>
             </div>
+            <div class="admin-stat-value">{{ total_appointments }}</div>
+            <div class="admin-stat-label">Appointments</div>
+            <a href="{% url 'appointment_list' %}" class="admin-stat-link">
+                <i class="fas fa-arrow-right me-1"></i> Manage
+            </a>
         </div>
     </div>
-    
     <div class="col-md-3 mb-4">
-        <div class="card text-white bg-info">
-            <div class="card-body">
-                <h5 class="card-title">Schedules</h5>
-                <p class="card-text display-4">{{ total_schedules }}</p>
-                <a href="{% url 'schedule_list' %}" class="btn btn-light">Manage</a>
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon schedules">
+                <i class="fas fa-clock"></i>
             </div>
+            <div class="admin-stat-value">{{ total_schedules }}</div>
+            <div class="admin-stat-label">Schedules</div>
+            <a href="{% url 'schedule_list' %}" class="admin-stat-link">
+                <i class="fas fa-arrow-right me-1"></i> Manage
+            </a>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <h3 class="mb-3">Quick Actions</h3>
-    </div>
+<!-- Quick Actions -->
+<h2 class="section-title-admin">Quick Actions</h2>
+<div class="row mb-5">
     <div class="col-md-3 mb-3">
-        <a href="{% url 'service_create' %}" class="btn btn-primary w-100">
-            <i class="bi bi-plus-circle"></i> Add New Service
+        <a href="{% url 'service_create' %}" class="quick-action-card">
+            <i class="fas fa-plus-circle quick-action-icon"></i>
+            <h6 class="quick-action-title">Add New Service</h6>
         </a>
     </div>
     <div class="col-md-3 mb-3">
-        <a href="{% url 'staff_create' %}" class="btn btn-success w-100">
-            <i class="bi bi-person-plus"></i> Add New Staff
+        <a href="{% url 'staff_create' %}" class="quick-action-card">
+            <i class="fas fa-user-plus quick-action-icon"></i>
+            <h6 class="quick-action-title">Add New Staff</h6>
         </a>
     </div>
     <div class="col-md-3 mb-3">
-        <a href="{% url 'schedule_create' %}" class="btn btn-warning w-100">
-            <i class="bi bi-calendar-plus"></i> Create Schedule
+        <a href="{% url 'schedule_create' %}" class="quick-action-card">
+            <i class="fas fa-calendar-plus quick-action-icon"></i>
+            <h6 class="quick-action-title">Create Schedule</h6>
         </a>
     </div>
     <div class="col-md-3 mb-3">
-        <a href="/admin/" class="btn btn-dark w-100">
-            <i class="bi bi-gear"></i> Django Admin
+        <a href="/admin/" class="quick-action-card">
+            <i class="fas fa-cog quick-action-icon"></i>
+            <h6 class="quick-action-title">Django Admin</h6>
         </a>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <h3 class="mb-3">Recent Appointments</h3>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Service</th>
-                        <th>Staff</th>
-                        <th>Date & Time</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for appointment in recent_appointments %}
-                    <tr>
-                        <td>{{ appointment.id }}</td>
-                        <td>{{ appointment.user.username }}</td>
-                        <td>{{ appointment.service.name }}</td>
-                        <td>{{ appointment.staff.user.username }}</td>
-                        <td>{{ appointment.schedule.date }} {{ appointment.schedule.time_slot }}</td>
-                        <td><span class="badge bg-{{ appointment.status|lower }}">{{ appointment.status }}</span></td>
-                        <td>
-                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-sm btn-info">View</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center">No appointments yet</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<!-- Recent Appointments -->
+<h2 class="section-title-admin">Recent Appointments</h2>
+<div class="appointments-table-wrapper">
+    {% if recent_appointments %}
+    <div class="table-responsive">
+        <table class="table table-modern">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Staff</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in recent_appointments %}
+                <tr>
+                    <td><strong>#{{ appointment.id }}</strong></td>
+                    <td>
+                        <i class="fas fa-user-circle me-2"></i>
+                        {{ appointment.user.username }}
+                    </td>
+                    <td>{{ appointment.service.name }}</td>
+                    <td>
+                        {% if appointment.staff %}
+                            {{ appointment.staff.user.get_full_name|default:appointment.staff.user.username }}
+                        {% else %}
+                            <span class="text-muted">Not assigned</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ appointment.schedule.date|date:"M d, Y" }}</td>
+                    <td>{{ appointment.schedule.time_slot }}</td>
+                    <td>
+                        <span class="status-badge {{ appointment.status|lower }}">
+                            {{ appointment.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'appointment_detail' appointment.id %}" class="btn-view-admin">
+                            <i class="fas fa-eye me-1"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+    {% else %}
+    <div class="empty-state-admin">
+        <i class="far fa-calendar"></i>
+        <p>No appointments yet. They will appear here once customers start booking.</p>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

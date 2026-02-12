@@ -22,7 +22,13 @@ urlpatterns = [
     path('appointments/<int:appointment_id>/', views.appointment_detail_api, name='appointment_detail_api'),
     path('appointments/<int:appointment_id>/update-status/', views.appointment_update_status_api, name='appointment_update_status_api'),
     path('appointments/<int:appointment_id>/cancel/', views.appointment_cancel_api, name='appointment_cancel_api'),
+    path('appointments/<int:appointment_id>/reschedule/', views.appointment_reschedule_api, name='appointment_reschedule_api'),
     
     # User Registration
     path('users/register/', views.user_register_api, name='user_register_api'),
+    
+    # Staff-Service Assignment
+    path('staff-services/assign/', views.staff_service_assign_api, name='staff_service_assign_api'),
+    path('staff-services/<int:staff_id>/<int:service_id>/remove/', views.staff_service_remove_api, name='staff_service_remove_api'),
+    path('staff/<int:staff_id>/services/', views.staff_services_list_api, name='staff_services_list_api'),
 ]

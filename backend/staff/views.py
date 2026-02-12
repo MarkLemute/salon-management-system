@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Staff, StaffService
 from backend.services.models import Service
+from backend.accounts.decorators import admin_required
 
 
 def staff_list(request):
@@ -21,12 +22,9 @@ def staff_detail(request, staff_id):
     })
 
 
-@login_required
+@admin_required
 def staff_create(request):
     """Create a new staff member (Admin only)."""
-    if request.user.role != 'Admin':
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('staff_list')
     
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
@@ -35,6 +33,11 @@ def staff_create(request):
         
         from backend.accounts.models import User
         user = get_object_or_404(User, id=user_id, role='Staff')
+        
+        # Check if user already has a staff profile
+        if hasattr(user, 'staff_profile'):
+            messages.error(request, 'This user already has a staff profile!')
+            return redirect('staff_create')
         
         Staff.objects.create(
             user=user,
@@ -46,17 +49,14 @@ def staff_create(request):
         return redirect('staff_list')
     
     from backend.accounts.models import User
-    staff_users = User.objects.filter(role='Staff')
+    # Only show users with Staff role who don't have a staff profile yet
+    staff_users = User.objects.filter(role='Staff').exclude(staff_profile__isnull=False)
     return render(request, 'staff_form.html', {'staff_users': staff_users})
 
 
-@login_required
+@admin_required
 def assign_service(request, staff_id):
     """Assign a service to a staff member (Admin only)."""
-    if request.user.role != 'Admin':
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('staff_list')
-    
     staff = get_object_or_404(Staff, id=staff_id)
     
     if request.method == 'POST':
