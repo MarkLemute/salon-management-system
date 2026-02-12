@@ -21,20 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return urlParams.get(name);
     }
     
-    // Auto-fill service from URL parameter if present
-    const serviceIdFromURL = getURLParameter('service');
-    if (serviceIdFromURL && serviceSelect) {
-        // Set the service dropdown value
-        serviceSelect.value = serviceIdFromURL;
-        
-        // Trigger the change event to load staff automatically
-        if (serviceSelect.value === serviceIdFromURL) {
-            // Successfully set the value, now trigger change event
-            const event = new Event('change', { bubbles: true });
-            serviceSelect.dispatchEvent(event);
-        }
-    }
-    
     // Update progress steps
     function updateSteps(activeStep) {
         for (let i = 1; i <= 4; i++) {
@@ -347,5 +333,19 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             submitBtn.disabled = true;
         });
+    }
+    
+    // Auto-fill service from URL parameter if present (must be after event listeners are attached)
+    const serviceIdFromURL = getURLParameter('service');
+    if (serviceIdFromURL && serviceSelect) {
+        // Set the service dropdown value
+        serviceSelect.value = serviceIdFromURL;
+        
+        // Trigger the change event to load staff automatically
+        if (serviceSelect.value === serviceIdFromURL) {
+            // Successfully set the value, now trigger change event
+            const event = new Event('change', { bubbles: true });
+            serviceSelect.dispatchEvent(event);
+        }
     }
 });
