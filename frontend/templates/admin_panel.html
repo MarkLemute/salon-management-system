@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Panel - Salon MS{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Admin Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Services</h5>
+                <p class="card-text display-4">{{ total_services }}</p>
+                <a href="{% url 'service_list' %}" class="btn btn-light">Manage</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Staff</h5>
+                <p class="card-text display-4">{{ total_staff }}</p>
+                <a href="{% url 'staff_list' %}" class="btn btn-light">Manage</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Appointments</h5>
+                <p class="card-text display-4">{{ total_appointments }}</p>
+                <a href="{% url 'appointment_list' %}" class="btn btn-light">Manage</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Schedules</h5>
+                <p class="card-text display-4">{{ total_schedules }}</p>
+                <a href="{% url 'schedule_list' %}" class="btn btn-light">Manage</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h3 class="mb-3">Quick Actions</h3>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'service_create' %}" class="btn btn-primary w-100">
+            <i class="bi bi-plus-circle"></i> Add New Service
+        </a>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'staff_create' %}" class="btn btn-success w-100">
+            <i class="bi bi-person-plus"></i> Add New Staff
+        </a>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'schedule_create' %}" class="btn btn-warning w-100">
+            <i class="bi bi-calendar-plus"></i> Create Schedule
+        </a>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="/admin/" class="btn btn-dark w-100">
+            <i class="bi bi-gear"></i> Django Admin
+        </a>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h3 class="mb-3">Recent Appointments</h3>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Service</th>
+                        <th>Staff</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in recent_appointments %}
+                    <tr>
+                        <td>{{ appointment.id }}</td>
+                        <td>{{ appointment.user.username }}</td>
+                        <td>{{ appointment.service.name }}</td>
+                        <td>{{ appointment.staff.user.username }}</td>
+                        <td>{{ appointment.schedule.date }} {{ appointment.schedule.time_slot }}</td>
+                        <td><span class="badge bg-{{ appointment.status|lower }}">{{ appointment.status }}</span></td>
+                        <td>
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-sm btn-info">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No appointments yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

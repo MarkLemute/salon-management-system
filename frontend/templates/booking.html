@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Appointment - Salon MS{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Book an Appointment</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>Select Service & Schedule</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="bookingForm">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="service_id" class="form-label">Service</label>
+                        <select class="form-select" id="service_id" name="service_id" required>
+                            <option value="">Select a service</option>
+                            {% for service in services %}
+                                <option value="{{ service.id }}" data-price="{{ service.price }}" data-duration="{{ service.duration }}">
+                                    {{ service.name }} - ${{ service.price }} ({{ service.duration }} mins)
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="staff_id" class="form-label">Staff Member</label>
+                        <select class="form-select" id="staff_id" name="staff_id" required>
+                            <option value="">Select staff</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="schedule_id" class="form-label">Date & Time</label>
+                        <select class="form-select" id="schedule_id" name="schedule_id" required>
+                            <option value="">Select date & time</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Additional Notes (Optional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Book Appointment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h4>Booking Summary</h4>
+            </div>
+            <div class="card-body">
+                <div id="booking-summary">
+                    <p class="text-muted">Select a service to see details</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/booking.js' %}"></script>
+{% endblock %}

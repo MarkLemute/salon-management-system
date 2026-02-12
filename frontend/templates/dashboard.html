@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Salon MS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Welcome, {{ user.username }}!</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Book Appointment</h5>
+                <p class="card-text">Schedule your next salon visit</p>
+                <a href="{% url 'appointment_create' %}" class="btn btn-primary">Book Now</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">My Appointments</h5>
+                <p class="card-text">View and manage your appointments</p>
+                <a href="{% url 'appointment_list' %}" class="btn btn-primary">View</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Services</h5>
+                <p class="card-text">Browse our salon services</p>
+                <a href="{% url 'service_list' %}" class="btn btn-primary">Browse</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user.role == 'Admin' %}
+<div class="row">
+    <div class="col-12">
+        <h3 class="mt-4 mb-3">Admin Quick Actions</h3>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'service_create' %}" class="btn btn-success w-100">Add Service</a>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'staff_create' %}" class="btn btn-success w-100">Add Staff</a>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'schedule_create' %}" class="btn btn-success w-100">Create Schedule</a>
+    </div>
+    <div class="col-md-3 mb-3">
+        <a href="/admin/" class="btn btn-dark w-100">Admin Panel</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

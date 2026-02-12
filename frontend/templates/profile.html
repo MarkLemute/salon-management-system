@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - Salon MS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">My Profile</h3>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Username:</strong></div>
+                    <div class="col-md-8">{{ user.username }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Email:</strong></div>
+                    <div class="col-md-8">{{ user.email }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Full Name:</strong></div>
+                    <div class="col-md-8">{{ user.get_full_name|default:"Not provided" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Phone:</strong></div>
+                    <div class="col-md-8">{{ user.phone|default:"Not provided" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Role:</strong></div>
+                    <div class="col-md-8"><span class="badge bg-info">{{ user.role }}</span></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Member Since:</strong></div>
+                    <div class="col-md-8">{{ user.date_joined|date:"F d, Y" }}</div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'appointment_list' %}" class="btn btn-primary">
+                        <i class="bi bi-calendar-check"></i> My Appointments
+                    </a>
+                    <a href="{% url 'appointment_create' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Book Appointment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
